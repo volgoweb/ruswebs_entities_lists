@@ -1,0 +1,4 @@
+name = ruswebs_entities_lists
+description = Списки сущностей
+package = ruswebs
+core = 7.x
