@@ -5,6 +5,7 @@
  */
 class rel_lists_collection {
 	private $tbl = 'rel_lists';
+
 	public function add($entities_lists) {
 		if (!in_array($entities_lists)) {
 			$entities_lists = array($entities_lists);
@@ -98,43 +99,4 @@ class rel_lists_collection {
 		else return array();
 	}
 
-	static function get_schema() {
-		$schema = array();
-
-		$schema['rel_lists'] = array(
-			'description' => 'Lits of entities. Module ruswebs_entities_lists.',
-			'fields' => array(
-				'id' => array(
-					'type'     => 'serial',
-					'unsigned' => TRUE,
-					'not null' => TRUE,
-				),
-				'title' => array(
-					'type'     => 'varchar',
-					'length'   => 100,
-					'not null' => TRUE,
-				),
-				'max_size' => array(
-					'type'     => 'int',
-					'unsigned' => TRUE,
-					'not null' => FALSE,
-				),
-				'autoadds' => array(
-					'description' => 'If "1", then entity will add to this list after creating.',
-					'type'        => 'int',
-					'unsigned'    => TRUE,
-					'not null'    => FALSE,
-				),
-				'title_field' => array(
-					'description' => 'Name of entity field, that will show on the list page.',
-					'type'        => 'varchar',
-					'length'      => 254,
-					'not null'    => TRUE,
-				),
-			),
-			'primary key' => array('id'),
-		);
-	
-		return $schema;
-	}
 }

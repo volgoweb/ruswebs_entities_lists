@@ -4,15 +4,91 @@
  * Implementation of hook_schema().
  */
 function ruswebs_entities_lists_schema() {
-	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+	$schema = array();
 
-	// коллекция списков
-	require_once($module_path . '/rel_lists_collection.class.php');
-	$lists_collection_schema = rel_lists_collection::get_schema();
+	$schema['rel_entity_types'] = array(
+		'description' => 'Relationship list and array of the entity type. Module ruswebs_entities_lists.',
+		'fields' => array(
+			'id' => array(
+				'type'     => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'entity_type' => array(
+				'type'     => 'varchar',
+				'length'   => 254,
+				'not null' => TRUE,
+			),
+			'list_id' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'indexes' => array(
+			'list_id' => array('list_id'),
+		),
+		'primary key' => array('id'),
+	);
 
-	// список
-	require_once($module_path . '/rel_entities_list.class.php');
-	$entities_list_schema = rel_entities_list::get_schema();
+	$schema['rel_entities'] = array(
+		'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
+		'fields' => array(
+			'id' => array(
+				'type'     => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'entity_id' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'list_id' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'indexes' => array(
+			'list_id' => array('list_id'),
+		),
+		'primary key' => array('id'),
+	);
 
-	return array_merge($lists_collection_schema, $entities_list_schema);
+	$schema['rel_lists'] = array(
+		'description' => 'Lits of entities. Module ruswebs_entities_lists.',
+		'fields' => array(
+			'id' => array(
+				'type'     => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'title' => array(
+				'type'     => 'varchar',
+				'length'   => 100,
+				'not null' => TRUE,
+			),
+			'max_size' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => FALSE,
+			),
+			'autoadds' => array(
+				'description' => 'If "1", then entity will add to this list after creating.',
+				'type'        => 'int',
+				'unsigned'    => TRUE,
+				'not null'    => FALSE,
+			),
+			'title_field' => array(
+				'description' => 'Name of entity field, that will show on the list page.',
+				'type'        => 'varchar',
+				'length'      => 254,
+				'not null'    => TRUE,
+			),
+		),
+		'primary key' => array('id'),
+	);
+
+	return $schema;
 }
