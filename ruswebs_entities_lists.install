@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implementation of hook_schema().
+ */
+function ruswebs_entities_lists_schema() {
+	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+
+	// коллекция списков
+	require_once($module_path . '/rel_lists_collection.class.php');
+	$lists_collection_schema = rel_lists_collection::get_schema();
+
+	// список
+	require_once($module_path . '/rel_entities_list.class.php');
+	$entities_list_schema = rel_entities_list::get_schema();
+
+	return array_merge($lists_collection_schema, $entities_list_schema);
+}
