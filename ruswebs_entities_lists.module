@@ -4,7 +4,6 @@
  */
 
 define('REL_URL_ADMIN', 'admin/content/ruswebs-entities-lists');
-define('REL_URL_ADMIN_LISTS_PAGE', REL_URL_ADMIN.'/lists');
 define('REL_URL_ADMIN_ADD_LIST', REL_URL_ADMIN.'/add-list');
 
 /**
@@ -19,30 +18,38 @@ function ruswebs_entities_lists_init() {
  * Implementation of hook_menu().
  */
 function ruswebs_entities_lists_menu() {
-	$items[REL_URL_ADMIN_LISTS_PAGE] = array(
-		'title' => 'Lists',
-		'description' => '',
+	$items[REL_URL_ADMIN . '/lists'] = array(
+		'title' => t('Lists'),
 		'type' => MENU_NORMAL_ITEM,
 		'page callback' => 'rel_lists_collection_page',
 		'access arguments' => array('admin entities lists'),
 		'file' => '/rel_lists_collection.admin.inc',
 	);
 
-	$items[REL_URL_ADMIN_LISTS_PAGE . '/%'] = array(
-		'title' => 'List',
-		'description' => '',
+	$items[REL_URL_ADMIN . '/list/%/params'] = array(
+		'title' => t('Edit list'),
 		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'page callback' => 'rel_list_edit_page',
-		'page arguments' => array(4),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('rel_admin_list_form', 4),
+		'access arguments' => array('admin entities lists'),
+		'file' => 'rel_list.admin.inc',
+	);
+
+	$items[REL_URL_ADMIN . '/list/%/entities'] = array(
+		'title' => t('Entities of list'),
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('rel_admin_list_entities_form', 4),
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
 
 
 	$items[REL_URL_ADMIN_ADD_LIST] = array(
-		'title' => 'List',
+		'title' => t('Add list'),
 		'type' => MENU_NORMAL_ITEM,
-		'page callback' => 'rel_list_add_page',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('rel_admin_list_form'),
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
@@ -58,6 +65,10 @@ function ruswebs_entities_lists_theme() {
 			'variables' => array(
 				'lists' => NULL,
 			),
+		),
+		'rel_admin_list_entities_form' => array(
+			'render element' => 'form',
+			'file' => 'rel_list.admin.inc',
 		),
 	);
 }

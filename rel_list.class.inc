@@ -150,7 +150,6 @@ class rel_list {
 
 		$fields['entity_params'] = serialize($fields['entity_params']);
 
-		dkdsm($fields);
 		return $fields;
 	}
 
@@ -193,12 +192,20 @@ class rel_list {
 			->orderBy('t.weight', 'ASC')
 			->execute()
 			->fetchAll();
-		return (array)$raws;
+
+		$array = array(); 
+		if ($raws) {
+			foreach ($raws as $key => $value) {
+				$array[] = (array)$value;	
+			}
+		}
+
+		return $array;
 	}
 
 	public static function get_entity_title($id, $type) {
 		$entity = entity_load($type, array($id));
-		return entity_label($type, array_pop($e));
+		return entity_label($type, array_pop($entity));
 	}
 
 	/**

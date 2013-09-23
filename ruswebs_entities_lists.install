@@ -26,7 +26,6 @@ function ruswebs_entities_lists_schema() {
 			),
 			'weight' => array(
 				'type'     => 'int',
-				'unsigned' => TRUE,
 				'not null' => TRUE,
 			),
 		),

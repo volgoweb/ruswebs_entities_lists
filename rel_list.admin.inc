@@ -1,6 +1,9 @@
 <?php
 
-function rel_admin_list_form($form, &$form_state, $list = NULL) {
+function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
+	// получаем объект списка
+	$list = new rel_list($list_id);
+
 	$form['#tree'] = TRUE;
 
 	$form['id'] = array(
@@ -18,11 +21,11 @@ function rel_admin_list_form($form, &$form_state, $list = NULL) {
 	);
 	
 	$form['max_size'] = array(
-		'#type'           => 'textfield',
-		'#title'          => t('Max entities in list'),
-		'#size'           => 20,
-		'#maxlength'      => 255,
-		'#required'       => TRUE,
+		'#type'          => 'textfield',
+		'#title'         => t('Max entities in list'),
+		'#size'          => 20,
+		'#maxlength'     => 5,
+		'#required'      => TRUE,
 		'#default_value' => $list->get_max_size(),
 	);
 
@@ -131,57 +134,108 @@ function rel_get_all_types_and_bundles() {
 	return $return;
 }
 
-function rel_list_edit_page($list_id) {
-	// получаем объект списка
-	$list = new rel_list($list_id);
-	// формируем начальные значения для формы
-	// выводим форму
-	$form = drupal_get_form('rel_admin_list_form', $list);
-	return drupal_render($form);
-}
-
-function rel_list_add_page() {
-	// выводим пустую форму
-	$form = drupal_get_form('rel_admin_list_form');
-	return drupal_render($form);
-}
-
 /**
  * Форма редактирования набора сущностей в определенном списке
  */
-function rel_admin_list_entities_form($form, $list_id) {
-	$form['#tree'] = TRUE;
+function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
+	$form['entities']['#tree'] = TRUE;
 
 	// получаем список всех сущностей
 	$list = new rel_list($list_id);
 	$entities = $list->get_entities_array();
 
-	$form['entities'] = array(
-		'#type' => 'fieldset',
-		'#title'       => t('Entities in list'),
-		// '#collapsible' => FALSE,
-		// '#collapsed'   => FALSE,
-	);
+	// $form['entities'] = array(
+	// 	'#type' => 'fieldset',
+	// 	'#title'       => t('Entities in list'),
+	// 	// '#collapsible' => FALSE,
+	// 	// '#collapsed'   => FALSE,
+	// );
 
 	if ($entities) {
 		foreach ($entities as $i => $arr) {
-			$form['entities'][$i]['id'] = array(
-				'#type' => 'markup',
-				'#markup' => $arr['id'],
+			$form['entities'][$i]['entity_id'] = array(
+				'#type'          => 'textfield',
+				'#default_value' => $arr['entity_id'],
+				'#size'          => 5,
+				'#maxlength'     => 5,
+				'#disabled'      => TRUE,
 			);
 
 			$form['entities'][$i]['title'] = array(
-				'#type' => 'markup',
-				'#markup' => rel_list::get_entity_title($arr['id']),
+				'#type'   => 'markup',
+				'#markup' => rel_list::get_entity_title($arr['entity_id'], $arr['entity_type']),
 			);
 
 			$form['entities'][$i]['weight'] = array(
-				'#type' => 'markup',
-				'#markup' => $arr['weight'],
+				'#type' => 'weight',
+				'#default_value' => $arr['weight'],
+				'#delta' => 10,
+				'#title_display' => 'invisible',
 			);
 		}
 	}
 
-	// $form['add'] = 
+	$form['actions'] = array('#type' => 'actions');
+	$form['actions']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save'),
+	);
+
+	return $form;
 }
 
+/**
+ * Submit для формы rel_admin_list_entities_form
+ * @TODO вынести код сохранения веса в класс
+ */
+function rel_admin_list_entities_form_submit($form, &$form_state) {
+	if (!empty($form_state['values']['entities'])) {
+		$form_values = &$form_state['values']['entities'];
+		foreach ($form_values as $key => $value) {
+			$row = $form_values[$key];
+			$query = db_update(rel_list::ENTITIES_TBL)
+				->fields(array('weight' => $row['weight']))
+				->condition('entity_id', $row['entity_id'])
+				->execute();
+		}
+	}
+}
+
+function theme_rel_admin_list_entities_form($vars) {
+	$form = $vars['form'];
+
+	$rows = array();
+
+	foreach (element_children($form['entities']) as $key => $arr) {
+		$form['entities'][$key]['weight']['#attributes']['class'] = array('entity-weight');
+		
+		$rows[] = array(
+			'data' => array(
+				drupal_render($form['entities'][$key]['entity_id']),
+				drupal_render($form['entities'][$key]['title']),
+				drupal_render($form['entities'][$key]['weight']),
+			),
+			'class' => array('draggable'),
+		);
+	}
+
+	$header = array(
+		t('entity_id'),
+		t('title'),
+		t('weight'),
+	);
+
+	$table_id = 'list-entities-table';
+
+	$output = theme('table', array(
+		'header' => $header,
+		'rows' => $rows,
+		'attributes' => array('id' => $table_id)
+	));
+
+	$output .= drupal_render_children($form);
+
+	drupal_add_tabledrag($table_id, 'order', 'sibling', 'entity-weight');
+
+	return $output;
+}
