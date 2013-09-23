@@ -2,3 +2,73 @@
 /*
  * Модуль ruswebs_entities_lists
  */
+
+define('REL_URL_ADMIN', 'admin/content/ruswebs-entities-lists');
+define('REL_URL_ADMIN_LISTS_PAGE', REL_URL_ADMIN.'/lists');
+define('REL_URL_ADMIN_ADD_LIST', REL_URL_ADMIN.'/add-list');
+
+/**
+ * Implements hook_init().
+ */
+function ruswebs_entities_lists_init() {
+	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+	require_once($module_path . '/rel_list.class.inc');	
+	require_once($module_path . '/rel_lists_collection.class.inc');	
+}
+/**
+ * Implementation of hook_menu().
+ */
+function ruswebs_entities_lists_menu() {
+	$items[REL_URL_ADMIN_LISTS_PAGE] = array(
+		'title' => 'Lists',
+		'description' => '',
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'rel_lists_collection_page',
+		'access arguments' => array('admin entities lists'),
+		'file' => '/rel_lists_collection.admin.inc',
+	);
+
+	$items[REL_URL_ADMIN_LISTS_PAGE . '/%'] = array(
+		'title' => 'List',
+		'description' => '',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'rel_list_edit_page',
+		'page arguments' => array(4),
+		'access arguments' => array('admin entities lists'),
+		'file' => 'rel_list.admin.inc',
+	);
+
+
+	$items[REL_URL_ADMIN_ADD_LIST] = array(
+		'title' => 'List',
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'rel_list_add_page',
+		'access arguments' => array('admin entities lists'),
+		'file' => 'rel_list.admin.inc',
+	);
+	
+	return $items;
+}
+function ruswebs_entities_lists_theme() {
+	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+	return array(
+		'lists_collection_page' => array(
+			'template' => 'lists_collection_page',
+			'path' => $module_path . '/tpl',
+			'variables' => array(
+				'lists' => NULL,
+			),
+		),
+	);
+}
+/**
+ * Implements hook_permission().
+ */
+function ruswebs_entities_lists_permission() {
+	return array(
+		'admin entities lists' => array(
+			'title' => t('admin entities lists'),
+			'description' => t('Rights for adding and manage lists entities (module ruswebs_entities_lists).'),
+		),
+	);
+}

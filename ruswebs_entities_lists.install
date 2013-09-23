@@ -6,36 +6,11 @@
 function ruswebs_entities_lists_schema() {
 	$schema = array();
 
-	$schema['rel_entity_types'] = array(
-		'description' => 'Relationship list and array of the entity type. Module ruswebs_entities_lists.',
-		'fields' => array(
-			'id' => array(
-				'type'     => 'serial',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'entity_type' => array(
-				'type'     => 'varchar',
-				'length'   => 254,
-				'not null' => TRUE,
-			),
-			'list_id' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-		),
-		'indexes' => array(
-			'list_id' => array('list_id'),
-		),
-		'primary key' => array('id'),
-	);
-
-	$schema['rel_entities'] = array(
+	$schema['rel_list_entity'] = array(
 		'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
 		'fields' => array(
-			'id' => array(
-				'type'     => 'serial',
+			'list_id' => array(
+				'type'     => 'int',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 			),
@@ -44,7 +19,12 @@ function ruswebs_entities_lists_schema() {
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 			),
-			'list_id' => array(
+			'entity_type' => array(
+				'type'     => 'varchar',
+				'length'   => 255,
+				'not null' => TRUE,
+			),
+			'weight' => array(
 				'type'     => 'int',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
@@ -53,10 +33,9 @@ function ruswebs_entities_lists_schema() {
 		'indexes' => array(
 			'list_id' => array('list_id'),
 		),
-		'primary key' => array('id'),
 	);
 
-	$schema['rel_lists'] = array(
+	$schema['rel_list'] = array(
 		'description' => 'Lits of entities. Module ruswebs_entities_lists.',
 		'fields' => array(
 			'id' => array(
@@ -66,7 +45,7 @@ function ruswebs_entities_lists_schema() {
 			),
 			'title' => array(
 				'type'     => 'varchar',
-				'length'   => 100,
+				'length'   => 255,
 				'not null' => TRUE,
 			),
 			'max_size' => array(
@@ -74,17 +53,12 @@ function ruswebs_entities_lists_schema() {
 				'unsigned' => TRUE,
 				'not null' => FALSE,
 			),
-			'autoadds' => array(
-				'description' => 'If "1", then entity will add to this list after creating.',
-				'type'        => 'int',
-				'unsigned'    => TRUE,
+			'entity_params' => array(
+				'description' => 'Serialized array of entity types and budles.',
+				'type'        => 'blob',
+				'size'        => 'big',
+				'serialize'   => TRUE,
 				'not null'    => FALSE,
-			),
-			'title_field' => array(
-				'description' => 'Name of entity field, that will show on the list page.',
-				'type'        => 'varchar',
-				'length'      => 254,
-				'not null'    => TRUE,
 			),
 		),
 		'primary key' => array('id'),
