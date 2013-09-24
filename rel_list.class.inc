@@ -41,10 +41,11 @@ class rel_list {
 	 */
 	const ENTITIES_TBL = 'rel_list_entity';
 
-	public function __construct($id) {
+	public function __construct($id = NULL) {
 		if (!empty($id)) {
 			$this->id = (int)$id;
-			$this->load();
+			$result = $this->load();
+			if (!$result) $this->id = NULL;
 		}
 	}
 
@@ -74,11 +75,15 @@ class rel_list {
 			->execute()
 			->fetchObject();
 
+		if (empty($raw)) return FALSE;
+
 		foreach (array('title', 'max_size') as $name) {
 			$this->$name = $raw->$name;
 		}
 
 		$this->entity_params = unserialize($raw->entity_params);
+
+		return TRUE;
 	}
 
 	/**
@@ -133,11 +138,23 @@ class rel_list {
 	private function create() {
 		$fields = $this->get_fields_for_query();
 
-		db_insert(self::LIST_TBL)
+		$this->id = db_insert(self::LIST_TBL)
 			->fields($fields)
 			->execute();
 	}
 
+	public function remove() {
+		db_delete(self::LIST_TBL)
+			->condition('id', $this->id)
+			->execute();
+		$this->remove_all_entites();
+	}
+
+	private function remove_all_entites() {
+		db_delete(self::ENTITIES_TBL)
+			->condition('list_id', $this->id)	
+			->execute();
+	}
 	private function get_fields_for_query() {
 		$fields = array();
 		foreach (array('title', 'max_size', 'entity_params') as $name) {

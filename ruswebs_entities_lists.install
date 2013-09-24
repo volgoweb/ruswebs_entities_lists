@@ -6,34 +6,6 @@
 function ruswebs_entities_lists_schema() {
 	$schema = array();
 
-	$schema['rel_list_entity'] = array(
-		'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
-		'fields' => array(
-			'list_id' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'entity_id' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'entity_type' => array(
-				'type'     => 'varchar',
-				'length'   => 255,
-				'not null' => TRUE,
-			),
-			'weight' => array(
-				'type'     => 'int',
-				'not null' => TRUE,
-			),
-		),
-		'indexes' => array(
-			'list_id' => array('list_id'),
-		),
-	);
-
 	$schema['rel_list'] = array(
 		'description' => 'Lits of entities. Module ruswebs_entities_lists.',
 		'fields' => array(
@@ -61,6 +33,34 @@ function ruswebs_entities_lists_schema() {
 			),
 		),
 		'primary key' => array('id'),
+	);
+
+	$schema['rel_list_entity'] = array(
+		'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
+		'fields' => array(
+			'list_id' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'entity_id' => array(
+				'type'     => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'entity_type' => array(
+				'type'     => 'varchar',
+				'length'   => 255,
+				'not null' => TRUE,
+			),
+			'weight' => array(
+				'type'     => 'int',
+				'not null' => TRUE,
+			),
+		),
+		'indexes' => array(
+			'list_id' => array('list_id'),
+		),
 	);
 
 	return $schema;

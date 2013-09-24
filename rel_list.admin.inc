@@ -1,14 +1,32 @@
 <?php
 
 function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
-	// получаем объект списка
-	$list = new rel_list($list_id);
+	$list_exists = FALSE;
+	if (!empty($list_id)) {
+		// получаем объект списка
+		$list = new rel_list($list_id);
+		// проверяем существует ли список с указанным идентификатором
+		if ($list->get_id() == NULL) {
+			$list_exists = FALSE;
+		}
+		else {
+			$list_exists = TRUE;
+		}
+
+		if (!$list_exists) {
+			$form['message'] = array(
+				'#type' => 'markup',
+				'#markup' => t("List with id=$list_id not found!"),
+			);
+			return $form;
+		}
+	}
 
 	$form['#tree'] = TRUE;
 
 	$form['id'] = array(
 		'#type'  => 'hidden',
-		'#value' => $list->get_id(),
+		'#value' => $list_exists ? $list->get_id() : '',
 	);
 
 	$form['title'] = array(
@@ -17,7 +35,7 @@ function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
 		'#size'           => 20,
 		'#maxlength'      => 255,
 		'#required'       => TRUE,
-		'#default_value' => $list->get_title(),
+		'#default_value' => $list_exists ? $list->get_title() : '',
 	);
 	
 	$form['max_size'] = array(
@@ -26,7 +44,7 @@ function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
 		'#size'          => 20,
 		'#maxlength'     => 5,
 		'#required'      => TRUE,
-		'#default_value' => $list->get_max_size(),
+		'#default_value' => $list_exists ? $list->get_max_size() : '',
 	);
 
 	// выводим поля со всеми типами сущностей (включая все bundle) 
@@ -63,14 +81,14 @@ function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
 				'#type'           => 'checkbox',
 				'#title'          => t('Can add to list'),
 				'#required'       => FALSE,
-				'#default_value' => $list->can_entity_add_to_list($type, $bundle),
+				'#default_value' => $list_exists ? $list->can_entity_add_to_list($type, $bundle) : '',
 			);
 
 			$form['entity_params'][$i]['autoadds'] = array(
 				'#type'           => 'checkbox',
 				'#title'          => t('Auto adding when entity created.'),
 				'#required'       => FALSE,
-				'#default_value' => $list->is_entity_autoadd_to_list($type, $bundle),
+				'#default_value' => $list_exists ? $list->is_entity_autoadd_to_list($type, $bundle) : '',
 			);
 		}
 	}
@@ -79,6 +97,12 @@ function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
 	$form['actions']['submit'] = array(
 		'#type'  => 'submit',
 		'#value' => t('Save'),
+	);
+
+	$form['actions']['remove'] = array(
+		'#type'  => 'submit',
+		'#value' => t('Remove'),
+		'#submit'  => array('rel_list_remove'),
 	);
 
 	return $form;
@@ -109,9 +133,17 @@ function rel_admin_list_form_submit(&$form, &$form_state) {
 	$list->set($list_params);
 	$list->save();	
 
-	$form_state['redirect'] = 'admin/content/ruswebs-entities-lists/lists';
+	$form_state['redirect'] = sprintf('%s/list/%d/entities', REL_URL_ADMIN_LISTS, $list->get_id());
 }
 
+function rel_list_remove($form, &$form_state) {
+	$list_id = $form_state['values']['id'];
+
+	$list = new rel_list($list_id);
+	$list->remove();
+	drupal_set_message(t("List '@title' has been remove.", array('@title' => $list->get_title())));
+	drupal_goto('/' . REL_URL_ADMIN_LISTS);
+}
 function rel_get_all_types_and_bundles() {
 	$types = entity_get_info();
 	foreach ($types as $type => $params) {

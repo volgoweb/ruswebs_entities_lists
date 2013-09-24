@@ -4,7 +4,8 @@
  */
 
 define('REL_URL_ADMIN', 'admin/content/ruswebs-entities-lists');
-define('REL_URL_ADMIN_ADD_LIST', REL_URL_ADMIN.'/add-list');
+define('REL_URL_ADMIN_LISTS', 'admin/content/ruswebs-entities-lists/lists');
+define('REL_URL_ADMIN_ADD_LIST', REL_URL_ADMIN_LISTS.'/add-list');
 
 /**
  * Implements hook_init().
@@ -18,7 +19,7 @@ function ruswebs_entities_lists_init() {
  * Implementation of hook_menu().
  */
 function ruswebs_entities_lists_menu() {
-	$items[REL_URL_ADMIN . '/lists'] = array(
+	$items[REL_URL_ADMIN_LISTS] = array(
 		'title' => t('Lists'),
 		'type' => MENU_NORMAL_ITEM,
 		'page callback' => 'rel_lists_collection_page',
@@ -26,20 +27,29 @@ function ruswebs_entities_lists_menu() {
 		'file' => '/rel_lists_collection.admin.inc',
 	);
 
-	$items[REL_URL_ADMIN . '/list/%/params'] = array(
+	$items[REL_URL_ADMIN_LISTS . '/list/%'] = array(
 		'title' => t('Edit list'),
-		'type' => MENU_DEFAULT_LOCAL_TASK,
+		// 'type' => MENU_DEFAULT_LOCAL_TASK,
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_form', 4),
+		'page arguments' => array('rel_admin_list_form', 5),
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
 
-	$items[REL_URL_ADMIN . '/list/%/entities'] = array(
+	$items[REL_URL_ADMIN_LISTS . '/list/%/params'] = array(
+		'title' => t('Edit list'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('rel_admin_list_form', 5),
+		'access arguments' => array('admin entities lists'),
+		'file' => 'rel_list.admin.inc',
+	);
+
+	$items[REL_URL_ADMIN_LISTS . '/list/%/entities'] = array(
 		'title' => t('Entities of list'),
 		'type' => MENU_LOCAL_TASK,
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_entities_form', 4),
+		'page arguments' => array('rel_admin_list_entities_form', 5),
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
@@ -57,7 +67,6 @@ function ruswebs_entities_lists_menu() {
 	$items['ruswebs-entities-lists/get-available-entities'] = array(
 		'type' => MENU_NORMAL_ITEM,
 		'page callback' => 'rel_get_available_entities',
-		'page arguments' => array(2),
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
