@@ -144,12 +144,23 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
 	$list = new rel_list($list_id);
 	$entities = $list->get_entities_array();
 
+	$form['list_id'] = array(
+		'#type' => 'hidden',
+		'#value' => $list_id,
+	);
+
+	$form['add']['#tree'] = TRUE;
+
 	$form['add']['title'] = array(
 		'#type' => 'textfield',
 		'#title'       => t('Title contains'),
 		'#autocomplete_path' => 'ruswebs-entities-lists/get-available-entities/' . $list_id,
-		// '#collapsible' => FALSE,
-		// '#collapsed'   => FALSE,
+	);
+
+	$form['add']['entity_add_submit'] = array(
+		'#type'              => 'submit',
+		'#value'             => t('Add'),
+		'#submit'              => array('rel_add_entity_to_list'),
 	);
 
 	if ($entities) {
@@ -255,10 +266,31 @@ function rel_get_available_entities($list_id, $text) {
 	$raws = $list->get_available_entities($text, $count);
 	$return = array();
 	if ($raws) {
-		foreach ($raws as $id => $title) {
-			$return[] = sprintf('%s [id:%d]', $title, $id);
+		foreach ($raws as $i => $obj) {
+			$key = rel_union_entity_params_for_textfield($obj->id, $obj->type, $obj->title);
+			$return[$key] = $key;
 		}
 	}
 
 	return drupal_json_output($return);
+}
+
+function rel_add_entity_to_list($form, &$form_state) {
+	$list_id = $form_state['values']['list_id'];
+	$list = new rel_list($list_id);
+
+	$title_value = $form_state['values']['add']['title'];
+	list($entity_id, $entity_type) = rel_extract_id_and_type($title_value);
+
+	$list->add_entity($entity_id, $entity_type);
+}
+
+function rel_union_entity_params_for_textfield($id, $type, $title) {
+	return sprintf('%s [%d:%s]', $title, $id, $type);
+}
+
+function rel_extract_id_and_type($string) {
+	preg_match('/\[(\d+):([^\]]+)\]/', $string, $match);
+	array_shift($match);
+	return $match;
 }

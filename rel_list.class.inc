@@ -242,41 +242,113 @@ class rel_list {
 		}
 	}
 
+	/**
+	 * Функция служит для получения списка основных параметров сущностей 
+	 * всех разрешенных для данного списка типов, содержащих в заголовке текст $title_contains
+	 * Возвращаемый массив ограничен количеством сущностей, указанном в аргументе $limit
+	 * @param $title_contains string
+	 * @param $limit int
+	 * @return array
+	 */
 	public function get_available_entities($title_contains = '', $limit = 10) {
-		$types_and_bundles = $this->entity_params;
-		if ($this->entity_params) {
-			$queries =  array();
-			foreach ($this->entity_params as $key => $arr) {
-				$type = $arr['type'];
-				if ( in_array($type, array_keys($queries)) ) continue;
+		if (empty($this->entity_params)) return;
 
-				$tbl            = self::get_entity_tbl($type);
-				$id_col         = self::get_entity_id_colname($type);
-				$title_col      = self::get_entity_title_colname($type);
+		// по всем типам сущностей, которые можно добавлять в список
+		// получаем набор строк из их таблиц
+		$queries =  array();
+		foreach ($this->entity_params as $key => $arr) {
+			// В $this->entity_params массив содержит столько элементов,
+			// сколько есть комбинаций типа и bundle сущности. 
+			// Сущности всех bundle, но одного типа, находятся в одной таблице,
+			// поэтому избегаем повторного формирования запроса для одного типа
+			$type = $arr['type'];
+			if ( array_key_exists($type, $queries) ) continue;
 
+			// так как каждый тип сущности хранится в разных таблицах и 
+			// в разных колонках хранит индентификатор и заголовок сущности, то определяем их
+			$tbl            = self::get_entity_tbl($type);
+			$id_col         = self::get_entity_id_colname($type);
+			$title_col      = self::get_entity_title_colname($type);
+
+			if (empty($id_col)) continue;
+
+			// можно использовать EntityFieldQuery(), но это почти не дает преимуществ
+			// Так как имена колонок в разных таблицах различно, то добавим одинаковые алиасы для полей
+			$q = db_select($tbl, $tbl);
+			$q->addField($tbl, $id_col, 'id');
+			$q->addField($tbl, $title_col, 'title');
+			$q->addExpression(sprintf(" '%s' ", $type), 'type');
+
+			if (!empty($title_col)) {
 				$cond_col = $tbl . '.' . $title_col;
 				$cond_value = '%' . db_like($title_contains) . '%';
-
-				$queries[$type] = db_select($tbl, $tbl)
-					->fields($tbl, array($id_col, $title_col))
-					->condition($cond_col, $cond_value, 'LIKE');
+				$q->condition($cond_col, $cond_value, 'LIKE');
 			}
 
-			// Объединяем запросы в union
-			$q1 = array_shift($queries);
-			if ($queries) {
-				foreach ($queries as $key => $q) {
-					$q1->union($q, 'UNION ALL');
-				}
-			}
-
-			$raw = $q1
-				->range(0, $limit)
-				->execute()
-				->fetchAllKeyed();
-
-			return $raw;
+			$queries[$type] = $q;
 		}
-	}
+
+		// Объединяем запросы в union, так как нам надо получить список сущностей всех типов
+		$q1 = array_shift($queries);
+		if ($queries) {
+			foreach ($queries as $key => $q) {
+				$q1->union($q, 'UNION ALL');
+			}
+		}
+
+		$raw = $q1
+			->range(0, $limit)
+			->execute()
+			->fetchAll();
 		
+		return $raw;
+	}
+
+	/**
+	 * Возвращает TRUE, если указанная сущность уже присутствует в списке
+	 * @param int $id - индентификатор сущности
+	 * @param string $type - тип сущности
+	 */ 
+	public function list_contains_entity($id, $type) {
+		$query = db_select(self::ENTITIES_TBL);
+		$query->addExpression('count(entity_id)', 'entities_count');
+		$query->condition('list_id', $this->id);
+		$query->condition('entity_type', $type);
+		$query->condition('entity_id', $id);
+		$count = $query->execute()->fetchField();
+		if (!empty($count)) return TRUE;
+		return FALSE;
+	}
+
+	/**
+	 * @return int минимальный вес среди сущностей данного списка
+	 */
+	public function get_min_weight() {
+		$query = db_select(self::ENTITIES_TBL);
+		$query->addExpression('MIN(weight)', 'min_weight');
+		$query->condition('list_id', $this->id);
+		$min_weight = $query->execute()->fetchField();
+
+		return (int)$min_weight;
+	}
+
+	/**
+	 * Добавляет сущность в данный список
+	 * @param int $id - индентификатор сущности
+	 * @param string $type - тип сущности
+	 */ 
+	public function add_entity($id, $type) {
+		if ($this->list_contains_entity($id, $type))  return;
+
+		$weight = $this->get_min_weight() - 10;
+		$fields = array(
+			'list_id' => $this->id,
+			'entity_id' => $id,
+			'entity_type' => $type,
+			'weight' => $weight,
+		);
+		db_insert(self::ENTITIES_TBL)
+			->fields($fields)
+			->execute();
+	}
 }
