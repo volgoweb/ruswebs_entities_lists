@@ -5,7 +5,7 @@
  */
 class rel_list {
 	/**
-	 * Индентификатор списка
+	 * идентификатор списка
 	 */
 	protected $id;
 	/**
@@ -82,7 +82,7 @@ class rel_list {
 	}
 
 	/**
-	 * @return int индентификатор списка
+	 * @return int идентификатор списка
 	 */
 	public function get_id() {
 		return $this->id;
@@ -265,10 +265,10 @@ class rel_list {
 			if ( array_key_exists($type, $queries) ) continue;
 
 			// так как каждый тип сущности хранится в разных таблицах и 
-			// в разных колонках хранит индентификатор и заголовок сущности, то определяем их
-			$tbl            = self::get_entity_tbl($type);
-			$id_col         = self::get_entity_id_colname($type);
-			$title_col      = self::get_entity_title_colname($type);
+			// в разных колонках хранит идентификатор и заголовок сущности, то определяем их
+			$tbl       = self::get_entity_tbl($type);
+			$id_col    = self::get_entity_id_colname($type);
+			$title_col = self::get_entity_title_colname($type);
 
 			if (empty($id_col)) continue;
 
@@ -278,8 +278,9 @@ class rel_list {
 			$q->addField($tbl, $id_col, 'id');
 			$q->addField($tbl, $title_col, 'title');
 			$q->addExpression(sprintf(" '%s' ", $type), 'type');
+			// @TODO добавить проверку "нет ли уже в списке данной сущности?"
 
-			if (!empty($title_col)) {
+			if (!empty($title_col) && !empty($title_contains)) {
 				$cond_col = $tbl . '.' . $title_col;
 				$cond_value = '%' . db_like($title_contains) . '%';
 				$q->condition($cond_col, $cond_value, 'LIKE');
@@ -306,7 +307,7 @@ class rel_list {
 
 	/**
 	 * Возвращает TRUE, если указанная сущность уже присутствует в списке
-	 * @param int $id - индентификатор сущности
+	 * @param int $id - идентификатор сущности
 	 * @param string $type - тип сущности
 	 */ 
 	public function list_contains_entity($id, $type) {
@@ -334,7 +335,7 @@ class rel_list {
 
 	/**
 	 * Добавляет сущность в данный список
-	 * @param int $id - индентификатор сущности
+	 * @param int $id - идентификатор сущности
 	 * @param string $type - тип сущности
 	 */ 
 	public function add_entity($id, $type) {
@@ -349,6 +350,18 @@ class rel_list {
 		);
 		db_insert(self::ENTITIES_TBL)
 			->fields($fields)
+			->execute();
+	}
+
+	/**
+	 * Удаляет сущность из данного списка 
+	 * @param int $id - идентификатор сущности
+	 * @param string $type - тип сущности
+	 */ 
+	public function remove_entity($id, $type) {
+		db_delete(self::ENTITIES_TBL)
+			->condition('entity_id', $id)
+			->condition('entity_type', $type)
 			->execute();
 	}
 }

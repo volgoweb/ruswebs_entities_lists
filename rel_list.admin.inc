@@ -158,9 +158,9 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
 	);
 
 	$form['add']['entity_add_submit'] = array(
-		'#type'              => 'submit',
-		'#value'             => t('Add'),
-		'#submit'              => array('rel_add_entity_to_list'),
+		'#type'   => 'submit',
+		'#value'  => t('Add'),
+		'#submit' => array('rel_add_entity_to_list'),
 	);
 
 	if ($entities) {
@@ -173,9 +173,24 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
 				'#disabled'      => TRUE,
 			);
 
+			$form['entities'][$i]['entity_type'] = array(
+				'#type'          => 'textfield',
+				'#default_value' => $arr['entity_type'],
+				'#size'          => 20,
+				'#maxlength'     => 20,
+				'#disabled'      => TRUE,
+			);
+
 			$form['entities'][$i]['title'] = array(
 				'#type'   => 'markup',
 				'#markup' => rel_list::get_entity_title($arr['entity_id'], $arr['entity_type']),
+			);
+
+			$form['entities'][$i]['remove'] = array(
+				'#type'   => 'submit',
+				'#value'  => t('Remove'),
+				'#name'   => "remove_$i",
+				'#submit' => array('rel_remove_entity_from_list'),
 			);
 
 			$form['entities'][$i]['weight'] = array(
@@ -202,12 +217,14 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
  */
 function rel_admin_list_entities_form_submit($form, &$form_state) {
 	if (!empty($form_state['values']['entities'])) {
+		// сохраняем новые веса сущностей в списке
 		$form_values = &$form_state['values']['entities'];
 		foreach ($form_values as $key => $value) {
 			$row = $form_values[$key];
 			$query = db_update(rel_list::ENTITIES_TBL)
 				->fields(array('weight' => $row['weight']))
 				->condition('entity_id', $row['entity_id'])
+				->condition('entity_type', $row['entity_type'])
 				->execute();
 		}
 	}
@@ -224,7 +241,9 @@ function theme_rel_admin_list_entities_form($vars) {
 		$rows[] = array(
 			'data' => array(
 				drupal_render($form['entities'][$key]['entity_id']),
+				drupal_render($form['entities'][$key]['entity_type']),
 				drupal_render($form['entities'][$key]['title']),
+				drupal_render($form['entities'][$key]['remove']),
 				drupal_render($form['entities'][$key]['weight']),
 			),
 			'class' => array('draggable'),
@@ -233,7 +252,9 @@ function theme_rel_admin_list_entities_form($vars) {
 
 	$header = array(
 		t('entity_id'),
+		t('entity_type'),
 		t('title'),
+		t('remove'),
 		t('weight'),
 	);
 
@@ -294,3 +315,17 @@ function rel_extract_id_and_type($string) {
 	array_shift($match);
 	return $match;
 }
+
+function rel_remove_entity_from_list($form, &$form_state) {
+	$list_id = $form_state['values']['list_id'];
+
+	$list = new rel_list($list_id);
+
+	$button_name = $form_state['clicked_button']['#name'];
+	$row_key     = str_replace('remove_', '', $button_name);
+	$entity_id   = $form_state['values']['entities'][$row_key]['entity_id'];
+	$entity_type = $form_state['values']['entities'][$row_key]['entity_type'];
+
+	$list->remove_entity($entity_id, $entity_type);
+}
+
