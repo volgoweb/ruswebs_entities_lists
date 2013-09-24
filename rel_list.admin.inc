@@ -144,12 +144,13 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
 	$list = new rel_list($list_id);
 	$entities = $list->get_entities_array();
 
-	// $form['entities'] = array(
-	// 	'#type' => 'fieldset',
-	// 	'#title'       => t('Entities in list'),
-	// 	// '#collapsible' => FALSE,
-	// 	// '#collapsed'   => FALSE,
-	// );
+	$form['add']['title'] = array(
+		'#type' => 'textfield',
+		'#title'       => t('Title contains'),
+		'#autocomplete_path' => 'ruswebs-entities-lists/get-available-entities/' . $list_id,
+		// '#collapsible' => FALSE,
+		// '#collapsed'   => FALSE,
+	);
 
 	if ($entities) {
 		foreach ($entities as $i => $arr) {
@@ -227,7 +228,9 @@ function theme_rel_admin_list_entities_form($vars) {
 
 	$table_id = 'list-entities-table';
 
-	$output = theme('table', array(
+	$output = drupal_render($form['add']);
+
+	$output .= theme('table', array(
 		'header' => $header,
 		'rows' => $rows,
 		'attributes' => array('id' => $table_id)
@@ -238,4 +241,24 @@ function theme_rel_admin_list_entities_form($vars) {
 	drupal_add_tabledrag($table_id, 'order', 'sibling', 'entity-weight');
 
 	return $output;
+}
+
+/**
+ * Callback функция, возвращающая значения для автодополняемого поля добавления сущности в список
+ * @return string (json) 
+ */
+function rel_get_available_entities($list_id, $text) {
+	if (empty($list_id) || !is_numeric($list_id)) return;
+
+	$list = new rel_list($list_id);
+	$count = 10;
+	$raws = $list->get_available_entities($text, $count);
+	$return = array();
+	if ($raws) {
+		foreach ($raws as $id => $title) {
+			$return[] = sprintf('%s [id:%d]', $title, $id);
+		}
+	}
+
+	return drupal_json_output($return);
 }

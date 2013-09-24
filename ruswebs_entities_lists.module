@@ -53,6 +53,14 @@ function ruswebs_entities_lists_menu() {
 		'access arguments' => array('admin entities lists'),
 		'file' => 'rel_list.admin.inc',
 	);
+
+	$items['ruswebs-entities-lists/get-available-entities'] = array(
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'rel_get_available_entities',
+		'page arguments' => array(2),
+		'access arguments' => array('admin entities lists'),
+		'file' => 'rel_list.admin.inc',
+	);
 	
 	return $items;
 }

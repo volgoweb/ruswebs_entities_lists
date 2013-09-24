@@ -224,23 +224,59 @@ class rel_list {
 	private static function get_entity_tbl($type) {
 		$entities_info = self::get_entities_info();
 		if ( isset($entities_info[$type]) ) {
-			return $entities_info[$type]['base_table'];
+			return $entities_info[$type]['base table'];
+		}
+	}
+
+	public static function get_entity_id_colname($type) {
+		$entities_info = self::get_entities_info();
+		if ( isset($entities_info[$type]) ) {
+			return $entities_info[$type]['entity keys']['id'];
+		}
+	}
+
+	public static function get_entity_title_colname($type) {
+		$entities_info = self::get_entities_info();
+		if ( isset($entities_info[$type]) ) {
+			return $entities_info[$type]['entity keys']['label'];
 		}
 	}
 
 	public function get_available_entities($title_contains = '', $limit = 10) {
 		$types_and_bundles = $this->entity_params;
 		if ($this->entity_params) {
+			$queries =  array();
 			foreach ($this->entity_params as $key => $arr) {
+				$type = $arr['type'];
 				if ( in_array($type, array_keys($queries)) ) continue;
 
-				$type = $arr['type'];
-				$tbl = self::get_entity_tbl($type);
-				$queries[$type] = db_select($tbl, $tbl);
+				$tbl            = self::get_entity_tbl($type);
+				$id_col         = self::get_entity_id_colname($type);
+				$title_col      = self::get_entity_title_colname($type);
+
+				$cond_col = $tbl . '.' . $title_col;
+				$cond_value = '%' . db_like($title_contains) . '%';
+
+				$queries[$type] = db_select($tbl, $tbl)
+					->fields($tbl, array($id_col, $title_col))
+					->condition($cond_col, $cond_value, 'LIKE');
 			}
+
+			// Объединяем запросы в union
+			$q1 = array_shift($queries);
+			if ($queries) {
+				foreach ($queries as $key => $q) {
+					$q1->union($q, 'UNION ALL');
+				}
+			}
+
+			$raw = $q1
+				->range(0, $limit)
+				->execute()
+				->fetchAllKeyed();
+
+			return $raw;
 		}
-		$raws = db_select($entities, 't')
-			->fields('t');
 	}
 		
 }
