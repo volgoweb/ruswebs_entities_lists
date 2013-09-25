@@ -213,6 +213,14 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
 				'#disabled'      => TRUE,
 			);
 
+			$form['entities'][$i]['bundle'] = array(
+				'#type'          => 'textfield',
+				'#default_value' => rel_list::get_entity_bundle($arr['entity_id'], $arr['entity_type']),
+				'#size'          => 20,
+				'#maxlength'     => 20,
+				'#disabled'      => TRUE,
+			);
+
 			$form['entities'][$i]['title'] = array(
 				'#type'   => 'markup',
 				'#markup' => rel_list::get_entity_title($arr['entity_id'], $arr['entity_type']),
@@ -274,6 +282,7 @@ function theme_rel_admin_list_entities_form($vars) {
 			'data' => array(
 				drupal_render($form['entities'][$key]['entity_id']),
 				drupal_render($form['entities'][$key]['entity_type']),
+				drupal_render($form['entities'][$key]['bundle']),
 				drupal_render($form['entities'][$key]['title']),
 				drupal_render($form['entities'][$key]['remove']),
 				drupal_render($form['entities'][$key]['weight']),
@@ -285,6 +294,7 @@ function theme_rel_admin_list_entities_form($vars) {
 	$header = array(
 		t('entity_id'),
 		t('entity_type'),
+		t('bundle'),
 		t('title'),
 		t('remove'),
 		t('weight'),

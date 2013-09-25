@@ -6,11 +6,11 @@
 class rel_lists_collection {
 	const LIST_TBL = 'rel_list';
 
-	public function add($entities_lists) {
-		if (!in_array($entities_lists)) {
-			$entities_lists = array($entities_lists);
+	public function add($lists) {
+		if (!in_array($lists)) {
+			$lists = array($lists);
 		}
-		if (empty($entities_lists)) return;
+		if (empty($lists)) return;
 
 		// существующие списки
 		$existing_ids = $this->get_ids();
@@ -20,23 +20,21 @@ class rel_lists_collection {
 			'title',
 			'max_size',
 			'autoadds',
-			'title_field',
-			'entity_types',
+			'entity_params',
 		);
 
-		$insert_query = db_insert(self::LIST_TBL, 'c')
+		$insert_query = db_insert(self::LIST_TBL, 't')
 			->fields($fields);
 
-		$update_query = db_update(self::LIST_TBL, 'c')
+		$update_query = db_update(self::LIST_TBL, 't')
 			->fields($fields);
 
-		foreach ($entities_lists as $key => $value) {
+		foreach ($lists as $key => $value) {
 			$fields = array(
 				'title'        => $value->title,
 				'max_size'     => $value->max_size,
 				'autoadds'     => $value->autoadds,
-				'title_field'  => $value->title_field,
-				'entity_types' => serialize($value->entity_types),
+				'entity_params' => serialize($value->entity_params),
 			);
 
 			if (!empty($value->id) && in_array($value->id, $existing_ids)) {
@@ -52,8 +50,8 @@ class rel_lists_collection {
 	}
 
 	public function get_raw() {
-		$raw = db_select(self::LIST_TBL, 'c')
-			->fields('c')
+		$raw = db_select(self::LIST_TBL, 't')
+			->fields('t')
 			->execute()
 			->fetchAll();
 		
@@ -62,26 +60,58 @@ class rel_lists_collection {
 		return $raw;
 	}
 
-	private function get_all() {
+	public function get_all() {
 		$collection = array();
 
 		$raw = $this->get_raw();
 		if ($raw) {
 			foreach ($raw as $key => $row) {
-				$entities_list = new rel_entities_list();
-				$collection[] = $entities_list;	
+				$list = new rel_list();
+				$collection[] = $list;	
 			}
 		}		
 		return $collection;
 	}
 
-	private function get_ids() {
-		$ids = db_select(self::LIST_TBL, 'c')
-			->fields('c', array('id'))
+	public function get_ids() {
+		$ids = db_select(self::LIST_TBL, 't')
+			->fields('t', array('id'))
 			->execute()
 			->fetchCol();
 		if ($ids) return $ids;
 		else return array();
 	}
 
+	/**
+	 * Возвращает массив тех списков, которые могут содержать указанный тип (и bundle) сущности
+	 * с включенным автодобавлением в список.
+	 * @params string $type - тип сущности
+	 * @params string $bundle - bundle сущности
+	 */
+	public function get_lists_with_autoadds($type, $bundle) {
+		$key_entity_type = rel_list::get_key_entity_type($type, $bundle);
+		$search = sprintf('s:%d:"%s"', strlen($key_entity_type), $key_entity_type);
+		$text = '%' . db_like($search) . '%';
+
+		$raws = db_select(self::LIST_TBL, 't')
+			->fields('t')
+			->condition('t.entity_params', $text, 'LIKE')
+			->condition('t.entity_params', '%"autoadds";i:1%', 'LIKE')
+			->execute()
+			->fetchAll();
+		
+		if (empty($raws)) return array();
+
+		$lists = array();
+		foreach ($raws as $i => $obj) {
+			$params = array(
+				'title' => $obj->title,
+				'max_size' => $obj->max_size,
+				'entity_params' => unserialize($obj->entity_params),
+			);
+			$lists[] = new rel_list($obj->id, $params);
+		}
+
+		return $lists;
+	}
 }

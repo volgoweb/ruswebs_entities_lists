@@ -41,11 +41,18 @@ class rel_list {
 	 */
 	const ENTITIES_TBL = 'rel_list_entity';
 
-	public function __construct($id = NULL) {
+	public function __construct($id = NULL, $params = array()) {
+		$already_load = FALSE;
+		if (!empty($title) && !empty($max_size) && !empty($entity_params)) {
+			$this->set($params);
+			$already_load = TRUE;
+		}
 		if (!empty($id)) {
 			$this->id = (int)$id;
-			$result = $this->load();
-			if (!$result) $this->id = NULL;
+			if (!$already_load) {
+				$result = $this->load();
+				if (!$result) $this->id = NULL;
+			}
 		}
 	}
 
@@ -223,6 +230,29 @@ class rel_list {
 	public static function get_entity_title($id, $type) {
 		$entity = entity_load($type, array($id));
 		return entity_label($type, array_pop($entity));
+	}
+
+	public static function get_entity_id($entity, $type) {
+		$id_colname = self::get_entity_id_colname($type);
+		if (isset($entity->$id_colname)) return $entity->$id_colname;
+	}
+
+	/**
+	 * Определяет bundle сущности.
+	 * @param int|stdClass $entity - либо идентификатор сущности, либо объект сущности
+	 * @param string $type - тип сущности
+	 * @return string - bundle указанной сущности
+	 */
+	public static function get_entity_bundle($entity, $type) {
+		if (is_numeric($entity)) {
+			$entity_id = $entity;
+			$entities = entity_load($type, array($entity_id));
+			$entity = array_shift($entities);
+		}
+
+		$entity_id = self::get_entity_id($entity, $type);
+		$wrapper = entity_metadata_wrapper($type, $entity_id);
+		return $wrapper->getBundle();
 	}
 
 	/**
