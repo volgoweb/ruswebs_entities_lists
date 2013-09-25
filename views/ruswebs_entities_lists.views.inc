@@ -33,7 +33,7 @@ function ruswebs_entities_lists_views_data() {
 		),
 	);
 
-	$data['rel_list_entity']['rel_entity_weight'] = array(
+	$data['rel_list_entity']['weight'] = array(
 		'title' => t('Entity weight in list'),
 		'help' => t('Entity weight in list.'),
 		'field' => array(
@@ -61,6 +61,12 @@ function ruswebs_entities_lists_views_handlers() {
 		),
 		'rel_handler_filter_rel_list' => array(
 			'parent' => 'views_handler_filter',
+		),
+		'rel_handler_field_rel_entity_weight' => array(
+			'parent' => 'views_handler_field',
+		),
+		'rel_handler_sort_rel_entity_weight' => array(
+			'parent' => 'views_handler_sort',
 		),
     ),
   );

@@ -5,5 +5,7 @@ core = 7.x
 
 files[] = rel_entities_list.class.inc
 files[] = rel_lists_collection.class.inc
-files[] = rel_handler_filter_rel_list.inc
-files[] = rel_handler_field_rel_list.inc
+files[] = views/rel_handler_filter_rel_list.inc
+files[] = views/rel_handler_field_rel_list.inc
+files[] = views/rel_handler_field_rel_entity_weight.inc
+files[] = views/rel_handler_sort_rel_entity_weight.inc

@@ -121,5 +121,9 @@ function ruswebs_entities_lists_entity_insert($entity, $type) {
  * Implements of hook_views_api().
  */
 function ruswebs_entities_lists_views_api() {
-  return array('api' => 3);
+	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+	return array(
+		'api' => 3,
+		'path' => $module_path . '/views',
+	);
 }
