@@ -384,6 +384,7 @@ class rel_list {
 	 * Добавляет сущность в данный список
 	 * @param int $id - идентификатор сущности
 	 * @param string $type - тип сущности
+	 * @TODO добавить ограничение на максимальное количество сущностей и удалять самую нижнюю при добавлении сущности в полный список
 	 */ 
 	public function add_entity($id, $type) {
 		if ($this->list_contains_entity($id, $type))  return;

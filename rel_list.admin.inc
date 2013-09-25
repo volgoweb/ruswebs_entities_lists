@@ -281,9 +281,9 @@ function theme_rel_admin_list_entities_form($vars) {
 		$rows[] = array(
 			'data' => array(
 				drupal_render($form['entities'][$key]['entity_id']),
+				drupal_render($form['entities'][$key]['title']),
 				drupal_render($form['entities'][$key]['entity_type']),
 				drupal_render($form['entities'][$key]['bundle']),
-				drupal_render($form['entities'][$key]['title']),
 				drupal_render($form['entities'][$key]['remove']),
 				drupal_render($form['entities'][$key]['weight']),
 			),
@@ -293,9 +293,9 @@ function theme_rel_admin_list_entities_form($vars) {
 
 	$header = array(
 		t('entity_id'),
+		t('title'),
 		t('entity_type'),
 		t('bundle'),
-		t('title'),
 		t('remove'),
 		t('weight'),
 	);

@@ -109,9 +109,7 @@ function ruswebs_entities_lists_entity_insert($entity, $type) {
 	$bundle          = rel_list::get_entity_bundle($entity, $type);
 	$list_collection = new rel_lists_collection();
 	$lists           = $list_collection->get_lists_with_autoadds($type, $bundle);
-	dsm($bundle);
-	dsm($entity_id);
-	dsm($type);
+
 	if (!empty($lists)) {
 		foreach ($lists as $i => $l) {
 			$l->add_entity($entity_id, $type);	
@@ -119,3 +117,9 @@ function ruswebs_entities_lists_entity_insert($entity, $type) {
 	}
 }
 
+/**
+ * Implements of hook_views_api().
+ */
+function ruswebs_entities_lists_views_api() {
+  return array('api' => 3);
+}
