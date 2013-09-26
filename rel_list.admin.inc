@@ -197,7 +197,7 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
     '#submit' => array('rel_add_entity_to_list'),
   );
 
-  if ($entities) {
+  if (!empty($entities)) {
     foreach ($entities as $i => $arr) {
       $form['entities'][$i]['entity_id'] = array(
         '#type'          => 'textfield',

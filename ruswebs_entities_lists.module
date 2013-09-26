@@ -76,13 +76,6 @@ function ruswebs_entities_lists_menu() {
 function ruswebs_entities_lists_theme() {
   $module_path = drupal_get_path('module', 'ruswebs_entities_lists');
   return array(
-    'lists_collection_page' => array(
-      'template' => 'lists_collection_page',
-      'path' => $module_path . '/tpl',
-      'variables' => array(
-        'lists' => NULL,
-      ),
-    ),
     'rel_admin_list_entities_form' => array(
       'render element' => 'form',
       'file' => 'rel_list.admin.inc',

@@ -51,9 +51,9 @@ class rel_list {
       $this->id = (int) $id;
       if (!$already_load) {
         $result = $this->load();
-    if (!$result) {
-      $this->id = NULL;
-    }
+        if (!$result) {
+          $this->id = NULL;
+        }
       }
     }
   }
@@ -84,9 +84,9 @@ class rel_list {
       ->execute()
       ->fetchObject();
 
-  if (empty($raw)) {
-    return FALSE;
-  }
+    if (empty($raw)) {
+      return FALSE;
+    }
 
     foreach (array('title', 'max_size') as $name) {
       $this->$name = $raw->$name;
@@ -222,9 +222,10 @@ class rel_list {
       ->fetchAll();
 
     $array = array(); 
-    if ($raws) {
+    if (!empty($raws)) {
       foreach ($raws as $key => $value) {
-        $array[] = (array) $value;  
+        $arr = (array) $value;
+        $array[] = $arr;  
       }
     }
 
@@ -232,8 +233,16 @@ class rel_list {
   }
 
   public static function get_entity_title($id, $type) {
-    $entity = entity_load($type, array($id));
-    return entity_label($type, array_pop($entity));
+    if (!self::is_exist_type($type)) {
+      watchdog('ruswebs_entities_lists', sprintf('The type "%s" is not exist', $type));
+      return;
+    }
+
+    $entities = entity_load($type, array($id));
+    if (empty($entities)) {
+      return;
+    }
+    return entity_label($type, array_pop($entities));
   }
 
   public static function get_entity_id($entity, $type) {
@@ -250,9 +259,17 @@ class rel_list {
    * @return string - bundle указанной сущности
    */
   public static function get_entity_bundle($entity, $type) {
+    if (!self::is_exist_type($type)) {
+      watchdog('ruswebs_entities_lists', sprintf('The type "%s" is not exist', $type));
+      return;
+    }
+    
     if (is_numeric($entity)) {
       $entity_id = $entity;
       $entities = entity_load($type, array($entity_id));
+      if (empty($entities)) {
+        return;
+      }
       $entity = array_shift($entities);
     }
 
@@ -274,6 +291,16 @@ class rel_list {
     return self::$entities_info;
   }
 
+  public static function is_exist_type($type) {
+    $entities_info = self::get_entities_info();
+    if ( isset($entities_info[$type]) ) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+    
+  }
   private static function get_entity_tbl($type) {
     $entities_info = self::get_entities_info();
     if ( isset($entities_info[$type]) ) {
