@@ -369,15 +369,27 @@ class rel_list {
 	}
 
 	/**
-	 * @return int минимальный вес среди сущностей данного списка
+	 * @return array некоторых свойств набора сущностей, содержащихся в списке,
+	 * такие как минимальный и максимальный вес, общее количество сущностей в списке
 	 */
-	public function get_min_weight() {
+	public function get_state() {
 		$query = db_select(self::ENTITIES_TBL);
 		$query->addExpression('MIN(weight)', 'min_weight');
+		$query->addExpression('MAX(weight)', 'max_weight');
+		$query->addExpression('count(entity_id)', 'count');
 		$query->condition('list_id', $this->id);
-		$min_weight = $query->execute()->fetchField();
+		$raw = $query->execute()->fetchObject();
 
-		return (int)$min_weight;
+		if (!empty($raw)) {
+			return (array)$raw;
+		}
+		else {
+			return array(
+				'min_weight' => 10 * $this->max_size,
+				'max_weight' => 10 * $this->max_size,
+				'count'      => 0,
+			);
+		}
 	}
 
 	/**
@@ -387,18 +399,65 @@ class rel_list {
 	 * @TODO добавить ограничение на максимальное количество сущностей и удалять самую нижнюю при добавлении сущности в полный список
 	 */ 
 	public function add_entity($id, $type) {
-		if ($this->list_contains_entity($id, $type))  return;
+		try {
+			if ($this->list_contains_entity($id, $type))  throw new Exception(t('This entity is already in the list.'));
 
-		$weight = $this->get_min_weight() - 10;
-		$fields = array(
-			'list_id' => $this->id,
-			'entity_id' => $id,
-			'entity_type' => $type,
-			'weight' => $weight,
-		);
-		db_insert(self::ENTITIES_TBL)
-			->fields($fields)
+			$state = $this->get_state();
+
+			// если кол-во сущностей списка уже равно максимально возможному, 
+			// то удаляем сущность с максимальном весом (низ списка)
+			if ($state['count'] >= $this->max_size) {
+				$result = $this->remove_with_max_weight();
+				if (!$result) throw new Exception(t('Error: the last entity has not been remove and new entity has not been add.'));
+			}
+
+			// новую сущность добавляем в начало списка с весом меньше минимального
+			$weight = $state['min_weight'] - 10;
+			$fields = array(
+				'list_id' => $this->id,
+				'entity_id' => $id,
+				'entity_type' => $type,
+				'weight' => $weight,
+			);
+			db_insert(self::ENTITIES_TBL)
+				->fields($fields)
+				->execute();
+		} catch (Exception $e) {
+			drupal_set_message($e->getMessage());
+		}
+		
+		return TRUE;
+	}
+
+	/**
+	 * Удаляет из списка самую "нижнюю" сущность с максимальным весом
+	 */
+	public function remove_with_max_weight() {
+		// db_delete не позволяет удалить одну строку, поэтому использую запрос через db_query
+		// $r = db_query("DELETE FROM {:tbl} WHERE `list_id`=:list_id ORDER BY `weight` DESC LIMIT 1", array(
+		// 	':tbl' => self::ENTITIES_TBL, 
+		// 	':list_id' => $this->id
+		// ));
+
+		// @TODO найти способ как сделать одним запросом (через друпал не работают подобные приемы)
+		$raw = db_select(self::ENTITIES_TBL, 't')
+			->fields('t')
+			->condition('t.list_id', $this->id)
+			->orderBy('t.weight', 'DESC')
+			->range(0, 1)
+			->execute()
+			->fetchObject();
+
+		if (empty($raw)) return FALSE;
+
+		$result = db_delete(self::ENTITIES_TBL)
+			->condition('entity_id', $raw->entity_id)
+			->condition('entity_type', $raw->entity_type)
+			->condition('list_id', $raw->list_id)
 			->execute();
+		if (empty($result)) return FALSE;
+
+		return TRUE;
 	}
 
 	/**
@@ -407,9 +466,13 @@ class rel_list {
 	 * @param string $type - тип сущности
 	 */ 
 	public function remove_entity($id, $type) {
-		db_delete(self::ENTITIES_TBL)
-			->condition('entity_id', $id)
-			->condition('entity_type', $type)
-			->execute();
+		try {
+			db_delete(self::ENTITIES_TBL)
+				->condition('entity_id', $id)
+				->condition('entity_type', $type)
+				->execute();
+		} catch (Exception $e) {
+			drupal_set_message($e->getMessage());
+		}
 	}
 }
