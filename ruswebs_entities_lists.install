@@ -4,64 +4,64 @@
  * Implementation of hook_schema().
  */
 function ruswebs_entities_lists_schema() {
-	$schema = array();
+  $schema = array();
 
-	$schema['rel_list'] = array(
-		'description' => 'Lits of entities. Module ruswebs_entities_lists.',
-		'fields' => array(
-			'id' => array(
-				'type'     => 'serial',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'title' => array(
-				'type'     => 'varchar',
-				'length'   => 255,
-				'not null' => TRUE,
-			),
-			'max_size' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => FALSE,
-			),
-			'entity_params' => array(
-				'description' => 'Serialized array of entity types and budles.',
-				'type'        => 'blob',
-				'size'        => 'big',
-				'serialize'   => TRUE,
-				'not null'    => FALSE,
-			),
-		),
-		'primary key' => array('id'),
-	);
+  $schema['rel_list'] = array(
+    'description' => 'Lits of entities. Module ruswebs_entities_lists.',
+    'fields' => array(
+      'id' => array(
+        'type'     => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type'     => 'varchar',
+        'length'   => 255,
+        'not null' => TRUE,
+      ),
+      'max_size' => array(
+        'type'     => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'entity_params' => array(
+        'description' => 'Serialized array of entity types and budles.',
+        'type'        => 'blob',
+        'size'        => 'big',
+        'serialize'   => TRUE,
+        'not null'    => FALSE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
 
-	$schema['rel_list_entity'] = array(
-		'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
-		'fields' => array(
-			'list_id' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'entity_id' => array(
-				'type'     => 'int',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-			),
-			'entity_type' => array(
-				'type'     => 'varchar',
-				'length'   => 255,
-				'not null' => TRUE,
-			),
-			'weight' => array(
-				'type'     => 'int',
-				'not null' => TRUE,
-			),
-		),
-		'indexes' => array(
-			'list_id' => array('list_id'),
-		),
-	);
+  $schema['rel_list_entity'] = array(
+    'description' => 'Relationship list and array of the entities. Module ruswebs_entities_lists.',
+    'fields' => array(
+      'list_id' => array(
+        'type'     => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'entity_id' => array(
+        'type'     => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'type'     => 'varchar',
+        'length'   => 255,
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'type'     => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'list_id' => array('list_id'),
+    ),
+  );
 
-	return $schema;
+  return $schema;
 }

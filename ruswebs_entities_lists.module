@@ -11,119 +11,119 @@ define('REL_URL_ADMIN_ADD_LIST', REL_URL_ADMIN_LISTS.'/add-list');
  * Implements hook_init().
  */
 function ruswebs_entities_lists_init() {
-	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
-	require_once($module_path . '/rel_list.class.inc');	
-	require_once($module_path . '/rel_lists_collection.class.inc');	
+  $module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+  require_once($module_path . '/rel_list.class.inc');  
+  require_once($module_path . '/rel_lists_collection.class.inc');  
 }
 /**
  * Implementation of hook_menu().
  */
 function ruswebs_entities_lists_menu() {
-	$items[REL_URL_ADMIN_LISTS] = array(
-		'title' => t('Lists'),
-		'type' => MENU_NORMAL_ITEM,
-		'page callback' => 'rel_lists_collection_page',
-		'access arguments' => array('admin entities lists'),
-		'file' => '/rel_lists_collection.admin.inc',
-	);
+  $items[REL_URL_ADMIN_LISTS] = array(
+    'title' => t('Lists'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'rel_lists_collection_page',
+    'access arguments' => array('admin entities lists'),
+    'file' => '/rel_lists_collection.admin.inc',
+  );
 
-	$items[REL_URL_ADMIN_LISTS . '/list/%'] = array(
-		'title' => t('Edit list'),
-		// 'type' => MENU_DEFAULT_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_form', 5),
-		'access arguments' => array('admin entities lists'),
-		'file' => 'rel_list.admin.inc',
-	);
+  $items[REL_URL_ADMIN_LISTS . '/list/%'] = array(
+    'title' => t('Edit list'),
+    // 'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rel_admin_list_form', 5),
+    'access arguments' => array('admin entities lists'),
+    'file' => 'rel_list.admin.inc',
+  );
 
-	$items[REL_URL_ADMIN_LISTS . '/list/%/params'] = array(
-		'title' => t('Edit list'),
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_form', 5),
-		'access arguments' => array('admin entities lists'),
-		'file' => 'rel_list.admin.inc',
-	);
+  $items[REL_URL_ADMIN_LISTS . '/list/%/params'] = array(
+    'title' => t('Edit list'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rel_admin_list_form', 5),
+    'access arguments' => array('admin entities lists'),
+    'file' => 'rel_list.admin.inc',
+  );
 
-	$items[REL_URL_ADMIN_LISTS . '/list/%/entities'] = array(
-		'title' => t('Entities of list'),
-		'type' => MENU_LOCAL_TASK,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_entities_form', 5),
-		'access arguments' => array('admin entities lists'),
-		'file' => 'rel_list.admin.inc',
-	);
+  $items[REL_URL_ADMIN_LISTS . '/list/%/entities'] = array(
+    'title' => t('Entities of list'),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rel_admin_list_entities_form', 5),
+    'access arguments' => array('admin entities lists'),
+    'file' => 'rel_list.admin.inc',
+  );
 
 
-	$items[REL_URL_ADMIN_ADD_LIST] = array(
-		'title' => t('Add list'),
-		'type' => MENU_NORMAL_ITEM,
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('rel_admin_list_form'),
-		'access arguments' => array('admin entities lists'),
-		'file' => 'rel_list.admin.inc',
-	);
+  $items[REL_URL_ADMIN_ADD_LIST] = array(
+    'title' => t('Add list'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rel_admin_list_form'),
+    'access arguments' => array('admin entities lists'),
+    'file' => 'rel_list.admin.inc',
+  );
 
-	$items['ruswebs-entities-lists/get-available-entities'] = array(
-		'type' => MENU_NORMAL_ITEM,
-		'page callback' => 'rel_get_available_entities',
-		'access arguments' => array('admin entities lists'),
-		'file' => 'rel_list.admin.inc',
-	);
-	
-	return $items;
+  $items['ruswebs-entities-lists/get-available-entities'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'rel_get_available_entities',
+    'access arguments' => array('admin entities lists'),
+    'file' => 'rel_list.admin.inc',
+  );
+  
+  return $items;
 }
 function ruswebs_entities_lists_theme() {
-	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
-	return array(
-		'lists_collection_page' => array(
-			'template' => 'lists_collection_page',
-			'path' => $module_path . '/tpl',
-			'variables' => array(
-				'lists' => NULL,
-			),
-		),
-		'rel_admin_list_entities_form' => array(
-			'render element' => 'form',
-			'file' => 'rel_list.admin.inc',
-		),
-	);
+  $module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+  return array(
+    'lists_collection_page' => array(
+      'template' => 'lists_collection_page',
+      'path' => $module_path . '/tpl',
+      'variables' => array(
+        'lists' => NULL,
+      ),
+    ),
+    'rel_admin_list_entities_form' => array(
+      'render element' => 'form',
+      'file' => 'rel_list.admin.inc',
+    ),
+  );
 }
 /**
  * Implements hook_permission().
  */
 function ruswebs_entities_lists_permission() {
-	return array(
-		'admin entities lists' => array(
-			'title' => t('admin entities lists'),
-			'description' => t('Rights for adding and manage lists entities (module ruswebs_entities_lists).'),
-		),
-	);
+  return array(
+    'admin entities lists' => array(
+      'title' => t('admin entities lists'),
+      'description' => t('Rights for adding and manage lists entities (module ruswebs_entities_lists).'),
+    ),
+  );
 }
 
 /**
  * Implements hook_entity_insert().
  */
 function ruswebs_entities_lists_entity_insert($entity, $type) {
-	$entity_id       = rel_list::get_entity_id($entity, $type);
-	$bundle          = rel_list::get_entity_bundle($entity, $type);
-	$list_collection = new rel_lists_collection();
-	$lists           = $list_collection->get_lists_with_autoadds($type, $bundle);
+  $entity_id       = rel_list::get_entity_id($entity, $type);
+  $bundle          = rel_list::get_entity_bundle($entity, $type);
+  $list_collection = new rel_lists_collection();
+  $lists           = $list_collection->get_lists_with_autoadds($type, $bundle);
 
-	if (!empty($lists)) {
-		foreach ($lists as $i => $l) {
-			$l->add_entity($entity_id, $type);	
-		}
-	}
+  if (!empty($lists)) {
+    foreach ($lists as $i => $l) {
+      $l->add_entity($entity_id, $type);  
+    }
+  }
 }
 
 /**
  * Implements of hook_views_api().
  */
 function ruswebs_entities_lists_views_api() {
-	$module_path = drupal_get_path('module', 'ruswebs_entities_lists');
-	return array(
-		'api' => 3,
-		'path' => $module_path . '/views',
-	);
+  $module_path = drupal_get_path('module', 'ruswebs_entities_lists');
+  return array(
+    'api' => 3,
+    'path' => $module_path . '/views',
+  );
 }
