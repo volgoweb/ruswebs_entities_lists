@@ -1,9 +1,12 @@
-name = ruswebs_entities_lists
+name = Ruswebs entities lists
 description = Списки сущностей
 package = Ruswebs
 core = 7.x
 
-files[] = rel_entities_list.class.inc
+dependencies[] = views
+dependencies[] = entity
+
+files[] = rel_list.class.inc
 files[] = rel_lists_collection.class.inc
 files[] = views/rel_handler_filter_rel_list.inc
 files[] = views/rel_handler_field_rel_list.inc
