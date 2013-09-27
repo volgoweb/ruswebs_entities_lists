@@ -125,6 +125,6 @@ function ruswebs_entities_lists_views_api() {
  */
 function ruswebs_entities_lists_form_SOBESEDNIK_CONTENT_UI_EDIT_FORM_alter(&$form, $form_state) {
   dsm($form);
-rel_add_entity_to_list_checkbox($form, $form['actions']['submit'], 1, 'sobesednik_content');
+// rel_add_entity_to_list_checkbox($form, $form['actions']['submit'], 1, 'sobesednik_content');
   
 }
