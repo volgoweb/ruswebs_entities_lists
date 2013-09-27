@@ -526,4 +526,19 @@ class rel_list {
       drupal_set_message($e->getMessage());
     }
   }
+  public function is_entity_in_list($entity_id, $entity_type) {
+    $q = db_select(self::ENTITIES_TBL);
+    $q->addExpression('COUNT(*)');
+    $count = $q->condition('list_id', $this->id)
+      ->condition('entity_id', $entity_id)
+      ->condition('entity_type', $entity_type)
+      ->execute()
+      ->fetchField();
+
+    if (!empty($count)) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
 }

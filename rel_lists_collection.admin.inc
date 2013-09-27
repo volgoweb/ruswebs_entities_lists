@@ -26,9 +26,17 @@ function rel_lists_collection_page() {
     t('Entities of list'),
   );
 
+  $button = l(t('Add'), REL_URL_ADMIN_ADD_LIST, array(
+    'attributes' => array(
+      'class' => array(
+        'button',
+      ),
+    ),
+  ));
+
   return theme('table', array(
     'header' => $header,
     'rows' => $rows,
-  ));
+  )) . $button;
 }
 

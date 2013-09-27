@@ -12,3 +12,4 @@ files[] = views/rel_handler_filter_rel_list.inc
 files[] = views/rel_handler_field_rel_list.inc
 files[] = views/rel_handler_field_rel_entity_weight.inc
 files[] = views/rel_handler_sort_rel_entity_weight.inc
+files[] = ruswebs_entities_lists.api.php
