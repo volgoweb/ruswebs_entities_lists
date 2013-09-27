@@ -14,6 +14,7 @@ function ruswebs_entities_lists_init() {
   $module_path = drupal_get_path('module', 'ruswebs_entities_lists');
   require_once($module_path . '/rel_list.class.inc');  
   require_once($module_path . '/rel_lists_collection.class.inc');  
+  require_once($module_path . '/ruswebs_entities_lists.api.php');  
 }
 /**
  * Implementation of hook_menu().
@@ -125,6 +126,11 @@ function ruswebs_entities_lists_views_api() {
  */
 function ruswebs_entities_lists_form_SOBESEDNIK_CONTENT_UI_EDIT_FORM_alter(&$form, $form_state) {
   dsm($form);
-// rel_add_entity_to_list_checkbox($form, $form['actions']['submit'], 1, 'sobesednik_content');
+  rel_add_entity_to_list_checkbox($form, $form['actions']['submit']['#submit'], 1, 'sobesednik_content');
+  
+}
+function ruswebs_entities_lists_form_PAGE_NODE_FORM_alter(&$form, $form_state) {
+  dsm($form);
+rel_add_entity_to_list_checkbox($form, $form['actions']['submit']['#submit'], 1, 'node');
   
 }

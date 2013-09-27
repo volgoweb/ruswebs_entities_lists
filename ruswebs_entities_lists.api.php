@@ -1,9 +1,11 @@
 <?php
   
-function rel_add_entity_to_list_checkbox(&$form, &$submit_element, $list_id, $entity_type, $entity_id = NULL, $weight = 1000) {
+function rel_add_entity_to_list_checkbox(&$form, &$submit_array, $list_id, $entity_type, $entity_id = NULL, $weight = 1000) {
   $list = new rel_list($list_id);
 
   $list_title = $list->get_title();
+  dsm($list_title);
+  // return;
 
   $name = "entity_to_list_$list_id";
   $form[$name] = array(
@@ -12,10 +14,10 @@ function rel_add_entity_to_list_checkbox(&$form, &$submit_element, $list_id, $en
     '#default_values' => !empty($entity_id) ? $list->is_entity_in_list($entity_id) : 0,
   );
 
-  $submit_element['#submit'][] = 'rel_add_entity_to_list';
+  $submit_array[] = 'rel_add_entity_to_list_submit';
 }
 
-function rel_add_entity_to_list(&$form, &$form_state) {
+function rel_add_entity_to_list_submit(&$form, &$form_state) {
   // $entity_id = $form_state['values']
   dsm($form);
   dsm($form_state);
