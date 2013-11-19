@@ -189,6 +189,7 @@ function rel_admin_list_entities_form($form, $form_state, $list_id = NULL) {
     '#type' => 'textfield',
     '#title'       => t('Title contains'),
     '#autocomplete_path' => 'ruswebs-entities-lists/get-available-entities/' . $list_id,
+	'#maxlength' => 256, 
   );
 
   $form['add']['entity_add_submit'] = array(
