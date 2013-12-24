@@ -45,3 +45,60 @@ function rel_add_entity_to_list_checkbox(&$form, &$submit_array, $list_id, $enti
   $submit_array[] = 'rel_add_entity_to_list_submit';
 }
 
+/**
+ * @param int $entity_id - идентификатор сущности
+ * @param string $type - тип сущности
+ * Возвращает массив всех списков, в которую можно добавить сущность с указанным id. 
+ */
+function rel_get_allowed_lists($entity_id, $type) {
+  $allowed_lists = array();
+
+  $entity = entity_load($entity_id);
+  $bundle = get_entity_bundle($entity, $type);
+
+  $collection = new rel_lists_collection();
+  $lists = $collection->get_all();
+  if (!empty($lists)) {
+    foreach ($lists as $i => $list) {
+      if ($list->can_entity_add_to_list($type, $bundle)) {
+        $allowed_lists[] = $list;
+      }
+    }
+  }
+
+  return $allowed_lists;
+}
+
+/**
+ * @param int $entity_id - идентификатор сущности
+ * @param string $type - тип сущности
+ * Возвращает массив объектов списков, в которых присутствует сущность с указанным идентификатором и типом.
+ */
+function rel_get_lists_with_entity($entity_id, $type) {
+  $lists_with_entity = array();
+
+  $lists = rel_get_allowed_lists($entity_id, $type);
+  if (!empty($lists)) {
+    foreach ($lists as $i => $list) {
+      if ($list->list_contains_entity($id, $type)) {
+        $lists_with_entity[] = $list;
+      }
+    }
+  }
+
+  return $lists_with_entity;
+}
+
+/**
+ * @param int $entity_id - идентификатор сущности
+ * @param string $type - тип сущности
+ * @param int $list_id - идентификатор списка
+ * Возвращает TRUE, если сущность содержится в списке
+ */
+function rel_is_list_contains_entity($id, $type, $list_id) {
+  $list = new rel_list($list_id);
+  if ($list->list_contains_entity($id, $type)) {
+    return TRUE;
+  }
+  return FALSE;
+}
