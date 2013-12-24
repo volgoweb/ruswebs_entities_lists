@@ -157,8 +157,9 @@ function rel_add_entity_to_list_submit(&$form, &$form_state) {
 function rel_get_allowed_lists($entity_id, $type) {
   $allowed_lists = array();
 
-  $entity = entity_load($entity_id);
-  $bundle = get_entity_bundle($entity, $type);
+  $entities = entity_load($type, array($entity_id));
+  $entity = reset($entities);
+  $bundle = rel_list::get_entity_bundle($entity, $type);
 
   $collection = new rel_lists_collection();
   $lists = $collection->get_all();
