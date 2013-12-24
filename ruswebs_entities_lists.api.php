@@ -50,16 +50,14 @@ function rel_add_entity_to_list_checkbox(&$form, &$submit_array, $list_id, $enti
  * @param string $type - тип сущности
  * Возвращает массив всех списков, в которую можно добавить сущность с указанным id. 
  */
-function rel_get_allowed_lists($entity_id, $type) {
-}
+// function rel_get_allowed_lists($entity_id, $type) { }
 
 /**
  * @param int $entity_id - идентификатор сущности
  * @param string $type - тип сущности
  * Возвращает массив объектов списков, в которых присутствует сущность с указанным идентификатором и типом.
  */
-function rel_get_lists_with_entity($entity_id, $type) {
-}
+// function rel_get_lists_with_entity($entity_id, $type) { }
 
 /**
  * @param int $entity_id - идентификатор сущности
@@ -67,5 +65,4 @@ function rel_get_lists_with_entity($entity_id, $type) {
  * @param int $list_id - идентификатор списка
  * Возвращает TRUE, если сущность содержится в списке
  */
-function rel_is_list_contains_entity($id, $type, $list_id) {
-}
+// function rel_is_list_contains_entity($id, $type, $list_id) { }
