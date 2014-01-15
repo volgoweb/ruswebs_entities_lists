@@ -140,6 +140,8 @@ function rel_admin_list_form_submit(&$form, &$form_state) {
 
   $list->save();  
 
+  drupal_set_message('Список сохранен.');
+
   $form_state['redirect'] = sprintf('%s/list/%d/entities', REL_URL_ADMIN_LISTS, $list->get_id());
 }
 
