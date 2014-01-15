@@ -43,7 +43,7 @@ class rel_list {
 
   public function __construct($id = NULL, $params = array()) {
     $already_load = FALSE;
-    if (!empty($title) && !empty($max_size) && !empty($entity_params)) {
+    if (!empty($params['title']) && !empty($params['max_size']) && !empty($params['entity_params'])) {
       $this->set($params);
       $already_load = TRUE;
     }
