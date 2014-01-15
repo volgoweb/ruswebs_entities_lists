@@ -42,19 +42,16 @@ class rel_list {
   const ENTITIES_TBL = 'rel_list_entity';
 
   public function __construct($id = NULL, $params = array()) {
-    $already_load = FALSE;
-    if (!empty($params['title']) && !empty($params['max_size']) && !empty($params['entity_params'])) {
-      $this->set($params);
-      $already_load = TRUE;
-    }
     if (!empty($id)) {
       $this->id = (int) $id;
-      if (!$already_load) {
-        $result = $this->load();
-        if (!$result) {
-          $this->id = NULL;
-        }
+      $result = $this->load();
+      if (!$result) {
+        $this->id = NULL;
       }
+    }
+
+    if (!empty($params['title']) && !empty($params['max_size']) && !empty($params['entity_params'])) {
+      $this->set($params);
     }
   }
 
@@ -63,9 +60,9 @@ class rel_list {
    * @param array $params - массив значений
    */
   public function set($params) {
-    if (!empty($params['id'])) {
-      $this->id = (int) $params['id'];
-    }
+    // if (!empty($params['id'])) {
+    //   $this->id = (int) $params['id'];
+    // }
 
     $this->title = $params['title'];
 

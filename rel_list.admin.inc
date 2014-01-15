@@ -109,11 +109,11 @@ function rel_admin_list_form($form, &$form_state, $list_id = NULL) {
 }
 
 function rel_admin_list_form_submit(&$form, &$form_state) {
-  $vs = $form_state['values'];
+  $values = $form_state['values'];
 
   $entity_params = array();
-  if ($vs['entity_params']) {
-    foreach ($vs['entity_params'] as $i => $params) {
+  if ($values['entity_params']) {
+    foreach ($values['entity_params'] as $i => $params) {
 		if (empty($params['active']))  {
 			continue;
 		}
@@ -126,13 +126,18 @@ function rel_admin_list_form_submit(&$form, &$form_state) {
   }
 
   $list_params = array(
-    'title' => $vs['title'],
-    'max_size' => $vs['max_size'],
+    'title'         => $values['title'],
+    'max_size'      => $values['max_size'],
     'entity_params' => $entity_params,
   );
+  if ($values['id']) {
+    $list = new rel_list($values['id'], $list_params);
+  }
+  else {
+    $list = new rel_list();
+    $list->set($list_params);
+  }
 
-  $list = new rel_list();
-  $list->set($list_params);
   $list->save();  
 
   $form_state['redirect'] = sprintf('%s/list/%d/entities', REL_URL_ADMIN_LISTS, $list->get_id());
