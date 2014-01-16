@@ -340,7 +340,8 @@ class rel_list {
       // сколько есть комбинаций типа и bundle сущности. 
       // Сущности всех bundle, но одного типа, находятся в одной таблице,
       // поэтому избегаем повторного формирования запроса для одного типа
-      $type = $arr['type'];
+      $type   = $arr['type'];
+      $bundle = $arr['bundle'];
     if ( array_key_exists($type, $queries) ) {
       continue;
     }
@@ -360,7 +361,7 @@ class rel_list {
       $q = db_select($tbl, $tbl);
       $q->addField($tbl, $id_col, 'id');
       $q->addField($tbl, $title_col, 'title');
-      $q->addExpression(sprintf(" '%s' ", $type), 'type');
+      $q->addExpression(sprintf(" '%s' ", $bundle), 'type');
       // @TODO добавить проверку "нет ли уже в списке данной сущности?"
 
       if (!empty($title_col) && !empty($title_contains)) {
