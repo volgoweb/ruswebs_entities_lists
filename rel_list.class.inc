@@ -361,7 +361,8 @@ class rel_list {
       $q = db_select($tbl, $tbl);
       $q->addField($tbl, $id_col, 'id');
       $q->addField($tbl, $title_col, 'title');
-      $q->addExpression(sprintf(" '%s' ", $bundle), 'type');
+      $q->addExpression(sprintf(" '%s' ", $type), 'type');
+      $q->condition($tbl . '.type', $bundle);
       // @TODO добавить проверку "нет ли уже в списке данной сущности?"
 
       if (!empty($title_col) && !empty($title_contains)) {
