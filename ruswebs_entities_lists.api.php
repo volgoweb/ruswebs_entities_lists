@@ -33,7 +33,7 @@ function rel_add_entity_to_list_checkbox(&$form, &$submit_array, $list_id, $enti
   $form[$name] = array(
     '#type' => 'checkbox',
     '#title' => t('Add to list "@title"', array('@title' => $list_title)),
-    '#default_values' => !empty($entity_id) ? $list->is_entity_in_list($entity_id) : 0,
+    '#default_values' => !empty($entity_id) ? $list->is_entity_in_list($entity_id, $entity_type) : 0,
     '#weight' => $weight,
   );
 
