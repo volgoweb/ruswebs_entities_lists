@@ -342,7 +342,7 @@ function rel_get_available_entities($list_id, $text) {
   $return = array();
   if ($raws) {
     foreach ($raws as $i => $obj) {
-      $key = rel_union_entity_params_for_textfield($obj->id, $obj->type, $obj->title);
+      $key = rel_union_entity_params_for_textfield($obj->id, $obj->entity_type, $obj->title);
       $return[$key] = $key;
     }
   }

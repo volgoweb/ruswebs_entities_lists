@@ -342,6 +342,7 @@ class rel_list {
       // поэтому избегаем повторного формирования запроса для одного типа
       $type   = $arr['type'];
       $bundle = $arr['bundle'];
+      watchdog('dk', __FUNCTION__ . ": ".json_encode($arr));
     if ( array_key_exists($type, $queries) ) {
       continue;
     }
@@ -361,7 +362,7 @@ class rel_list {
       $q = db_select($tbl, $tbl);
       $q->addField($tbl, $id_col, 'id');
       $q->addField($tbl, $title_col, 'title');
-      $q->addExpression(sprintf(" '%s' ", $type), 'type');
+      $q->addExpression(sprintf(" '%s' ", $type), 'entity_type');
       $q->condition($tbl . '.type', $bundle);
       // @TODO добавить проверку "нет ли уже в списке данной сущности?"
 
