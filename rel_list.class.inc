@@ -342,10 +342,9 @@ class rel_list {
       // поэтому избегаем повторного формирования запроса для одного типа
       $type   = $arr['type'];
       $bundle = $arr['bundle'];
-      watchdog('dk', __FUNCTION__ . ": ".json_encode($arr));
-    if ( array_key_exists($type, $queries) ) {
-      continue;
-    }
+      if ( array_key_exists($type, $queries) ) {
+        continue;
+      }
 
       // так как каждый тип сущности хранится в разных таблицах и 
       // в разных колонках хранит идентификатор и заголовок сущности, то определяем их
@@ -353,9 +352,9 @@ class rel_list {
       $id_col    = self::get_entity_id_colname($type);
       $title_col = self::get_entity_title_colname($type);
 
-    if (empty($id_col)) {
-      continue;
-    }
+      if (empty($id_col)) {
+        continue;
+      }
 
       // можно использовать EntityFieldQuery(), но это почти не дает преимуществ
       // Так как имена колонок в разных таблицах различно, то добавим одинаковые алиасы для полей
