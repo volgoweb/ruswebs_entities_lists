@@ -11,7 +11,9 @@
  *
  * function my_module_form_MY_TYPE_ENTITY_UI_EDIT_FORM_alter(&$form, $form_state) {
  *   $list_id = 1;
- *   rel_add_entity_to_list_checkbox($form, $form['actions']['submit']['#submit'], $list_id, 'my_type_entity');
+ *   $entity_id = NULL; // в случае, если форма редактирования существующей сущности, то подставляйте реальное id сущности
+ *   $weight = 100; // вес галочки "включить в список" в форме
+ *   rel_add_entity_to_list_checkbox($form, $form['actions']['submit']['#submit'], $list_id, 'my_type_entity', $entity_id, $weight);
  * }
  *
  *
