@@ -68,3 +68,30 @@ function rel_add_entity_to_list_checkbox(&$form, &$submit_array, $list_id, $enti
  * Возвращает TRUE, если сущность содержится в списке
  */
 // rel_is_list_contains_entity($id, $type, $list_id)
+
+/**
+ * Функция возвращает массив сущностей, содержащихся в списке.
+ *
+ * @param int $list_id - идентификатор списка сущностей
+ * @return array
+ * Пример возвращаемого массива:
+    array (
+      0 => array (
+        'list_id' => '2',
+        'entity_id' => '210002',
+        'entity_type' => 'sobesednik_content',
+        'weight' => '-10',
+      ),
+      1 => array (
+        'list_id' => '2',
+        'entity_id' => '192562',
+        'entity_type' => 'sobesednik_content',
+        'weight' => '-10',
+      ),
+    )
+
+ */
+function rel_get_list_entities($list_id) {
+  $list = new rel_list($list_id);
+  return $list->get_entities_array();
+}
