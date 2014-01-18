@@ -342,7 +342,7 @@ class rel_list {
       // поэтому избегаем повторного формирования запроса для одного типа
       $type   = $arr['type'];
       $bundle = $arr['bundle'];
-      if ( array_key_exists($type, $queries) ) {
+      if ( array_key_exists($type.'__'.$bundle, $queries) ) {
         continue;
       }
 
@@ -371,7 +371,7 @@ class rel_list {
         $q->condition($cond_col, $cond_value, 'LIKE');
       }
 
-      $queries[$type] = $q;
+      $queries[$type.'__'.$bundle] = $q;
     }
 
     // Объединяем запросы в union, так как нам надо получить список сущностей всех типов
@@ -381,7 +381,9 @@ class rel_list {
         $q1->union($q, 'UNION ALL');
       }
     }
-
+$qs = $q1->range(0, $limit)->execute()->getQueryString();
+watchdog('dk', '<pre>'.$qs.'</pre>');
+watchdog('dk', 'count queries='.count($queries));
     $raw = $q1
       ->range(0, $limit)
       ->execute()
