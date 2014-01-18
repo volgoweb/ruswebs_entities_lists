@@ -381,7 +381,7 @@ class rel_list {
       foreach ($queries as $key => $q) {
         $q1->union($q, 'UNION ALL');
       }
-      $g_temp = $q1;
+      $q_temp = $q1;
       $qs = $q_temp->range(0, $limit)->execute()->getQueryString();
       watchdog('dk', '<pre>'.$qs.'</pre>');
       watchdog('dk', 'count queries='.count($queries));
