@@ -376,24 +376,23 @@ class rel_list {
     }
 
     // Объединяем запросы в union, так как нам надо получить список сущностей всех типов
-    $q1 = array_shift($queries);
     if ($queries) {
+      $q1 = array_shift($queries);
       foreach ($queries as $key => $q) {
         $q1->union($q, 'UNION ALL');
       }
+      $g_temp = $q1;
+      $qs = $q_temp->range(0, $limit)->execute()->getQueryString();
+      watchdog('dk', '<pre>'.$qs.'</pre>');
+      watchdog('dk', 'count queries='.count($queries));
+
+      $raw = $q1
+        ->range(0, $limit)
+        ->execute()
+        ->fetchAll();
+      
+      return $raw;
     }
-
-    $g_temp = $q1;
-$qs = $q_temp->range(0, $limit)->execute()->getQueryString();
-watchdog('dk', '<pre>'.$qs.'</pre>');
-watchdog('dk', 'count queries='.count($queries));
-
-    $raw = $q1
-      ->range(0, $limit)
-      ->execute()
-      ->fetchAll();
-    
-    return $raw;
   }
 
   /**
