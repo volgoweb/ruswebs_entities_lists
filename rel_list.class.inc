@@ -333,8 +333,8 @@ class rel_list {
     }
 
     // по всем типам сущностей, которые можно добавлять в список
-    // получаем набор строк из их таблиц
-    $queries =  array();
+    // получаем набор типов и бандлов
+    $types_and_bundles = array();
     foreach ($this->entity_params as $key => $arr) {
       // В $this->entity_params массив содержит столько элементов,
       // сколько есть комбинаций типа и bundle сущности. 
@@ -342,10 +342,11 @@ class rel_list {
       // поэтому избегаем повторного формирования запроса для одного типа
       $type   = $arr['type'];
       $bundle = $arr['bundle'];
-      if ( array_key_exists($type.'__'.$bundle, $queries) ) {
-        continue;
-      }
+      $types_and_bundles[$type][] = $bundle;
+    }
 
+    $queries =  array();
+    foreach ($types_and_bundles as $type => $bundles) {
       // так как каждый тип сущности хранится в разных таблицах и 
       // в разных колонках хранит идентификатор и заголовок сущности, то определяем их
       $tbl       = self::get_entity_tbl($type);
@@ -362,7 +363,7 @@ class rel_list {
       $q->addField($tbl, $id_col, 'id');
       $q->addField($tbl, $title_col, 'title');
       $q->addExpression(sprintf(" '%s' ", $type), 'entity_type');
-      $q->condition($tbl . '.type', $bundle);
+      $q->condition($tbl . '.type', array_unique($bundles), 'IN');
       // @TODO добавить проверку "нет ли уже в списке данной сущности?"
 
       if (!empty($title_col) && !empty($title_contains)) {
@@ -371,7 +372,7 @@ class rel_list {
         $q->condition($cond_col, $cond_value, 'LIKE');
       }
 
-      $queries[$type.'__'.$bundle] = $q;
+      $queries[] = $q;
     }
 
     // Объединяем запросы в union, так как нам надо получить список сущностей всех типов
@@ -381,9 +382,12 @@ class rel_list {
         $q1->union($q, 'UNION ALL');
       }
     }
-$qs = $q1->range(0, $limit)->execute()->getQueryString();
+
+    $g_temp = $q1;
+$qs = $q_temp->range(0, $limit)->execute()->getQueryString();
 watchdog('dk', '<pre>'.$qs.'</pre>');
 watchdog('dk', 'count queries='.count($queries));
+
     $raw = $q1
       ->range(0, $limit)
       ->execute()
